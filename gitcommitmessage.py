@@ -55,7 +55,7 @@ def get_modulemap(unit, modulemap=dict()):
 
 def get_commit_type():
     print("Select commit type...")
-    types = ["[i]Impl", "[e]Enh", "[b]Bug", "[c]Cascade", "[o]Opt", "[r]Ref", "[u]Build"]
+    types = ["[i]Impl", "[e]Enh", "[b]Bug", "[c]Cascade", "[o]Opt", "[r]Ref", "[u]Build", "[d]Doc"]
     return types[TerminalMenu(types).show()][3:]
 
 def fmt(modulemap, commit_type, stem=False):
