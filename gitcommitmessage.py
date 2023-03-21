@@ -3,6 +3,7 @@
 # TODO: option to make it to ask for a change type for each file being added
 # into the commit
 # TODO: Snippets
+# TODO: Handle renames
 
 from simple_term_menu import TerminalMenu
 from command import command
