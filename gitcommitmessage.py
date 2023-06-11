@@ -13,7 +13,7 @@ from gitshort import get_staged
 import argparse
 
 COMMITMSG = ".commitmsg"
-EDITOR = "vim"
+EDITOR = "vi"
 
 
 def splitext(f):
@@ -75,7 +75,7 @@ def fmt(modulemap, commit_type, stem=False):
 def command_commit(prefix):
     with open(COMMITMSG, 'w') as f:
         f.write(prefix)
-    command("vim " + COMMITMSG)
+    command(EDITOR + ' ' + COMMITMSG)
     command("git commit --file " + COMMITMSG)
 
 
@@ -138,6 +138,9 @@ def main():
         print(e)
     finally:
         command("rm -f " + COMMITMSG)
+
+
+
 
 
 if __name__ == "__main__":
