@@ -13,7 +13,7 @@ from gitshort import get_staged
 import argparse
 
 COMMITMSG = ".commitmsg"
-EDITOR = "vi"
+EDITOR = "vim"
 
 
 def splitext(f):
