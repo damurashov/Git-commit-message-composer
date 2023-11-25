@@ -92,6 +92,8 @@ class Execution:
         commit_message += ' '.join(commit_types)
         commit_message += ' | '
 
+        return commit_message
+
     def execute_commit(self, module_representation_map: dict):
         commit_message = self.format_commit_message(module_representation_map)
         tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message)
