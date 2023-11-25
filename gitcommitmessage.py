@@ -51,9 +51,9 @@ class Staged:
         file = File(file_path, module, representation)
 
         if module not in self._module_map:
-            self._module_map[module] = set()
+            self._module_map[module] = list()
 
-        self._module_map[module] = self._module_map[module].union({file})
+        self._module_map[module].append(file)
 
     def get_module_map(self):
         return self._module_map
