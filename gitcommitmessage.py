@@ -5,12 +5,12 @@
 # TODO: Snippets
 # TODO: Handle renames
 
+import argparse
+import dataclasses
+import pathlib
 import tired.command
 import tired.git
 import tired.ui
-import argparse
-import pathlib
-import dataclasses
 
 
 OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = False
