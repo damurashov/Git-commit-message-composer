@@ -21,6 +21,8 @@ OPTION_KEEP_EXTENSION = False
 MODULE_CONTENT_STEM_SYMBOL = "*"
 COMMIT_MESSAGE_TEMPORARY_FILE_NAME = ".commitmsg_deleteme"
 OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
+OPTION_USE_COMMON_COMMIT_MESSAGE = True
+COMMON_COMMIT_MESSAGE = None
 
 
 def _git_stash_unstaged_files():
@@ -148,8 +150,11 @@ class Execution:
                 tired.logging.debug(f"Adding file {file_path.full_path}")
                 tired.command.execute(f"git add \"{file_path.full_path}\"")
 
-        tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message)
-        tired.command.execute(f"git commit --file \"{COMMIT_MESSAGE_TEMPORARY_FILE_NAME}\"")
+        if OPTION_USE_COMMON_COMMIT_MESSAGE:
+            tired.command.execute(f"git commit -m '{commit_message}{COMMON_COMMIT_MESSAGE}'")
+        else:
+            tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message)
+            tired.command.execute(f"git commit --file \"{COMMIT_MESSAGE_TEMPORARY_FILE_NAME}\"")
 
     def _build_commit_queue(self):
         tired.logging.info("Building commit queue")
@@ -221,25 +226,35 @@ def _parse_arguments():
     global OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS
     global OPTION_STEM_MODULE_DETAILS
     global OPTION_KEEP_EXTENSION
+    global OPTION_USE_COMMON_COMMIT_MESSAGE
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
     parser.add_argument("--stem", action="store_true", help="If true, module components will not be comma-enumerated"
         ", but replaced w/ * symbol, if there is more than 1 element in each module")
     parser.add_argument("--ext", action="store_true", help="Keep file extension")
+    parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
     p = parser.parse_args()
 
     OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = p.sep
     OPTION_STEM_MODULE_DETAILS = p.stem
     OPTION_KEEP_EXTENSION = p.ext
+    OPTION_USE_COMMON_COMMIT_MESSAGE = p.mes
 
     return p
 
 
 def main():
+    global OPTION_USE_COMMON_COMMIT_MESSAGE
+    global COMMON_COMMIT_MESSAGE
     # Only apply changes that are staged (useful, since we operate with file names)
     _parse_arguments()
     _git_stash_unstaged_files()
+
+    # Specify commit message for each file
+    if OPTION_USE_COMMON_COMMIT_MESSAGE:
+        COMMON_COMMIT_MESSAGE = tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR)
+
     staged = Staged()
 
     try:
