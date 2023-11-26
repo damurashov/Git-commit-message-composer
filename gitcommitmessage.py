@@ -105,8 +105,10 @@ class Execution:
         module_representation_map = commit_content.get_module_map()
 
         commit_message = '['
-        is_first = True
         commit_types = set()
+
+        # State machine quirks
+        is_first = True
 
         for module_name in module_representation_map.keys():
             if is_first:
