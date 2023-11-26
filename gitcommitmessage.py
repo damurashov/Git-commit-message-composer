@@ -39,10 +39,17 @@ def _git_unstage_all_files():
 
 @dataclasses.dataclass
 class File:
-    full_path: str
     module: str
-    representation: str
+    full_path: str
     commit_type: str
+
+    def get_representation(self):
+        if OPTION_KEEP_EXTENSION:
+            representation = pathlib.Path(self.full_path).name
+        else:
+            representation = pathlib.Path(self.full_path).stem
+
+        return representation
 
 
 class Staged:
@@ -51,12 +58,8 @@ class Staged:
         self._module_map = dict()
 
     def add_file(self, module, file_path, commit_type):
-        if OPTION_KEEP_EXTENSION:
-            representation = pathlib.Path(file_path).name
-        else:
-            representation = pathlib.Path(file_path).stem
 
-        file = File(file_path, module, representation, commit_type)
+        file = File(module, file_path, commit_type)
 
         if module not in self._module_map:
             self._module_map[module] = list()
@@ -123,7 +126,7 @@ class Execution:
                 tired.logging.debug("Stemming module details")
                 commit_message += MODULE_CONTENT_STEM_SYMBOL
             else:
-                commit_message += ','.join(i.representation for i in module_representation_map[module_name])
+                commit_message += ','.join(i.get_representation() for i in module_representation_map[module_name])
 
             commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
 
