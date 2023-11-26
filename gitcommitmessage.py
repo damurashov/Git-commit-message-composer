@@ -6,10 +6,12 @@
 # TODO: Handle renames
 
 import argparse
+import copy
 import dataclasses
 import pathlib
 import tired.command
 import tired.git
+import tired.logging
 import tired.ui
 
 
@@ -23,11 +25,15 @@ OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
 
 def _git_stash_unstaged_files():
     tired.command.execute("git stash -k -u")
-    tired.command.execute("git reset")
 
 
 def _git_unstash():
-    tired.command.execute("git checkout stash@{0} --theirs .")
+    tired.logging.info("Restoring staged files")
+    # tired.command.execute("git checkout stash@{0} --theirs .")
+    tired.command.execute("git restore --source=stash@{0} --worktree .")
+
+
+def _git_unstage_all_files():
     tired.command.execute("git reset")
 
 
@@ -50,7 +56,7 @@ class Staged:
         else:
             representation = pathlib.Path(file_path).stem
 
-        file = File(file_path, module, representation)
+        file = File(file_path, module, representation, commit_type)
 
         if module not in self._module_map:
             self._module_map[module] = list()
@@ -65,16 +71,39 @@ class FormattingStrategy:
     pass
 
 
+class CommitContent:
+    def __init__(self) -> None:
+        self._modulemap = dict()
+
+    def add_file(self, module_name, file: File):
+        if module_name not in self._modulemap:
+            self._modulemap[module_name] = list()
+
+        self._modulemap[module_name].append(file)
+
+    def get_module_map(self):
+        return self._modulemap
+
+    def is_empty(self):
+        return len(self._modulemap.values()) == 0
+
 class Execution:
     """
     Executes sequential commits
     """
 
     def __init__(self, staged: Staged):
+        # All staged files
         self._module_map = staged.get_module_map()
+        self._commit_queue = list()
+
+    def _add_commit(self, commit_content: CommitContent):
+        self._commit_queue.append(copy.copy(commit_content))
 
     @staticmethod
-    def format_commit_message(module_representation_map):
+    def format_commit_message(commit_content: CommitContent):
+        module_representation_map = commit_content.get_module_map()
+
         commit_message = '['
         is_first = True
         commit_types = set()
@@ -87,8 +116,8 @@ class Execution:
 
             commit_message += module_name
             commit_message += ':'
-            commit_message += ','.join(module_representation_map[module_name].representation)
-            commit_types = commit_types.union(module_representation_map[module_name].commit_type)
+            commit_message += ','.join(i.representation for i in module_representation_map[module_name])
+            commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
 
         commit_message += "] "
         commit_message += ' '.join(commit_types)
@@ -96,34 +125,53 @@ class Execution:
 
         return commit_message
 
-    def execute_commit(self, module_representation_map: dict):
-        commit_message = self.format_commit_message(module_representation_map)
+    @staticmethod
+    def execute_commit(commit_content: CommitContent):
+        if commit_content.is_empty():
+            tired.logging.warning("Empty commit, skipping")
+
+            return
+
+        commit_message = Execution.format_commit_message(commit_content)
+
+        for file_paths in commit_content.get_module_map().values():
+            for file_path in file_paths:
+                tired.logging.debug(f"Adding file {file_path.full_path}")
+                tired.command.execute(f"git add \"{file_path.full_path}\"")
+
         tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message)
-
-        for v in module_representation_map.values():
-            tired.command.execute(f"git add \"{v.full_path}\"")
-
         tired.command.execute(f"git commit --file \"{COMMIT_MESSAGE_TEMPORARY_FILE_NAME}\"")
 
-    def run(self):
-        module_representation_map = dict()
+    def _build_commit_queue(self):
+        tired.logging.info("Building commit queue")
+        commit_content = CommitContent()
+        should_commit_after_file = OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS and not OPTION_STEM_MODULE_DETAILS
+        should_commit_after_module = OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS and OPTION_STEM_MODULE_DETAILS
 
         for module_name in self._module_map.keys():
-            module_name[module_representation_map] = set()
 
-            if OPTION_STEM_MODULE_DETAILS:
-                module_representation_map[module_name] = MODULE_CONTENT_STEM_SYMBOL
+            for file in self._module_map[module_name]:
+                commit_content.add_file(module_name, file)
 
-                if OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS:
-                    self.execute_commit(module_representation_map)  # TODO watabout other files
-                    module_representation_map = dict()
-            else:
-                for file in self._module_map[module_name]:
-                    module_representation_map[module_name] = module_representation_map[module_name].union({file})
+                if should_commit_after_file:
+                    self._add_commit(commit_content)
+                    commit_content = CommitContent()
 
-                if OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS:
-                    self.execute_commit(module_representation_map)
-                    module_representation_map = dict()
+            if should_commit_after_module:
+                self._add_commit(commit_content)
+                commit_content = CommitContent()
+
+        self._add_commit(commit_content)
+
+    def _execute_commit_queue(self):
+        tired.logging.info("Executing commit queue")
+
+        for commit_content in self._commit_queue:
+            Execution.execute_commit(commit_content)
+
+    def run(self):
+        self._build_commit_queue()
+        self._execute_commit_queue()
 
 
 def file_path_decompose(file_path: str):
@@ -185,10 +233,14 @@ def main():
 
     try:
         commit_type = _cli_get_commit_type()
+        tired.logging.debug(f"Staged files: {list(tired.git.get_staged_file_paths())}")
 
         for staged_file_path in tired.git.get_staged_file_paths():
             module = _cli_get_file_module(staged_file_path)
-            staged.add_file(module, staged_file_path)
+            staged.add_file(module, staged_file_path, commit_type)
+
+        # Unstage files. Each file will be staged separately
+        _git_unstage_all_files()
 
         execution = Execution(staged)
         execution.run()
