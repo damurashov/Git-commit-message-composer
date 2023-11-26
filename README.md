@@ -1,4 +1,4 @@
-# GiCo
+# GiCo 🤌
 
 Git commit composer, or GiCo, is your ultimate answer to "keep your commits as
 small as possible". Once you have staged whatever the mess you have accumulated
