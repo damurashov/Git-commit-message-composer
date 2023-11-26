@@ -5,7 +5,7 @@ def get_long_description():
         return f.read()
 
 setup(
-    name="tired",
+    name="gico",
     packages=[
         "gico"
     ],
