@@ -118,7 +118,13 @@ class Execution:
 
             commit_message += module_name
             commit_message += ':'
-            commit_message += ','.join(i.representation for i in module_representation_map[module_name])
+
+            if OPTION_STEM_MODULE_DETAILS:
+                tired.logging.debug("Stemming module details")
+                commit_message += MODULE_CONTENT_STEM_SYMBOL
+            else:
+                commit_message += ','.join(i.representation for i in module_representation_map[module_name])
+
             commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
 
         commit_message += "] "
