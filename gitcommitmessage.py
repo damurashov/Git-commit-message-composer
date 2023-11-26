@@ -220,6 +220,7 @@ def _cli_get_commit_type() -> str:
 def _parse_arguments():
     global OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS
     global OPTION_STEM_MODULE_DETAILS
+    global OPTION_KEEP_EXTENSION
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
