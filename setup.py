@@ -7,7 +7,7 @@ def get_long_description():
 setup(
     name="tired",
     packages=[
-        "tired"
+        "gico"
     ],
     include_package_data=True,
     license="MIT",
@@ -27,5 +27,10 @@ setup(
     ],
     python_requires=">=3.7",
     version="1.0.0",
+    console_scripts={
+        'console_scripts': [
+            'gico = gico.gico:main'
+        ]
+    }
 )
 
