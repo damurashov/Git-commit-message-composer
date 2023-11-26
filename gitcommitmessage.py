@@ -26,7 +26,8 @@ def _git_stash_unstaged_files():
 
 
 def _git_unstash():
-    tired.command.execute("git stash pop")
+    tired.command.execute("git checkout stash@{0} --theirs .")
+    tired.command.execute("git reset")
 
 
 @dataclasses.dataclass
