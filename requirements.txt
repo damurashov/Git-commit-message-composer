@@ -1,1 +1,1 @@
-tired==0.3.1
+tired @ git+https://github.com/damurashov/TIRED.git@dev
