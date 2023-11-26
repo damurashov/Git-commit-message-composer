@@ -23,6 +23,7 @@ COMMIT_MESSAGE_TEMPORARY_FILE_NAME = ".commitmsg_deleteme"
 OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
 OPTION_USE_COMMON_COMMIT_MESSAGE = True
 COMMON_COMMIT_MESSAGE = None
+OPTION_USE_COMMON_COMMIT_TYPE = True
 
 
 def _git_stash_unstaged_files():
@@ -207,7 +208,7 @@ def _cli_get_file_module(file_path: str) -> str:
     return selected_option
 
 
-def _cli_get_commit_type() -> str:
+def _cli_get_commit_type(file_name="") -> str:
     commit_types = [
         "[b] Bug",  # Fixed some bug
         "[i] Impl",  # Implementation (added new feature)
@@ -216,7 +217,7 @@ def _cli_get_commit_type() -> str:
         "[u] Build",  # Build system / project management tweaks
         "[d] Doc",  # Updated documentation
     ]
-    selected_id = tired.ui.select(commit_types, "Select commit type")
+    selected_id = tired.ui.select(commit_types, f"Select commit type {file_name}")
     commit_type = commit_types[selected_id][4:]
 
     return commit_type
@@ -227,6 +228,7 @@ def _parse_arguments():
     global OPTION_STEM_MODULE_DETAILS
     global OPTION_KEEP_EXTENSION
     global OPTION_USE_COMMON_COMMIT_MESSAGE
+    global OPTION_USE_COMMON_COMMIT_TYPE
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
@@ -234,12 +236,14 @@ def _parse_arguments():
         ", but replaced w/ * symbol, if there is more than 1 element in each module")
     parser.add_argument("--ext", action="store_true", help="Keep file extension")
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
+    parser.add_argument("--typ", action="store_false", help="Use individual commit type for each file")
     p = parser.parse_args()
 
     OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = p.sep
     OPTION_STEM_MODULE_DETAILS = p.stem
     OPTION_KEEP_EXTENSION = p.ext
     OPTION_USE_COMMON_COMMIT_MESSAGE = p.mes
+    OPTION_USE_COMMON_COMMIT_TYPE = p.typ
 
     return p
 
@@ -247,21 +251,29 @@ def _parse_arguments():
 def main():
     global OPTION_USE_COMMON_COMMIT_MESSAGE
     global COMMON_COMMIT_MESSAGE
+    global OPTION_USE_COMMON_COMMIT_TYPE
     # Only apply changes that are staged (useful, since we operate with file names)
     _parse_arguments()
     _git_stash_unstaged_files()
 
-    # Specify commit message for each file
-    if OPTION_USE_COMMON_COMMIT_MESSAGE:
-        COMMON_COMMIT_MESSAGE = tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR)
 
     staged = Staged()
 
     try:
-        commit_type = _cli_get_commit_type()
+        # Specify commit message for each file
+        if OPTION_USE_COMMON_COMMIT_MESSAGE:
+            COMMON_COMMIT_MESSAGE = tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR)
+
+        # Specify commit type for all messages, if appropriate
+        if OPTION_USE_COMMON_COMMIT_TYPE:
+            commit_type = _cli_get_commit_type()
+
         tired.logging.debug(f"Staged files: {list(tired.git.get_staged_file_paths())}")
 
         for staged_file_path in tired.git.get_staged_file_paths():
+            if not OPTION_USE_COMMON_COMMIT_TYPE:
+                commit_type = _cli_get_commit_type(staged_file_path)
+
             module = _cli_get_file_module(staged_file_path)
             staged.add_file(module, staged_file_path, commit_type)
 
