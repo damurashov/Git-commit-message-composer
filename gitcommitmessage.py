@@ -216,7 +216,7 @@ def _cli_get_commit_type() -> str:
     return commit_type
 
 
-def _get_args():
+def _parse_arguments():
     global OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS
     global OPTION_STEM_MODULE_DETAILS
 
@@ -236,6 +236,7 @@ def _get_args():
 
 def main():
     # Only apply changes that are staged (useful, since we operate with file names)
+    _parse_arguments()
     _git_stash_unstaged_files()
     staged = Staged()
 
