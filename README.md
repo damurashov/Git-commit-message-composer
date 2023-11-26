@@ -1,13 +1,41 @@
-# About
+# GiCo
 
-Interactive commit message composer.
+Git commit composer, or GiCo, is your ultimate answer to "keep your commits as
+small as possible". Once you have staged whatever the mess you have accumulated
+so far, run `gico`, and it will make you a neat and comprehensive commit
+history.
 
-Usage:
+```
+git add <your files>
+gico --help
+gico
+```
 
-1. Stage changed files into index
-2. Run the script. It will guide you through commit module and type selection
-- Add `--sep` option to store each module in a separate commit
-- Add `--stem` option to replace module enumeration w/ the `*` symbol
+GiCo provides you with a zero-friction way to do this
+
+```
+> git log --all --decorate --oneline
+
+e01f0cc (HEAD -> master) [bb:b] Impl | Similar message for each commit
+358fcb1 [aa:a] Ref | Similar message for each commit, but different commit types
+8c73fb5 [aa:a] Impl | Similar message for each commit, but different commit types
+af31232 [aa:* bb:*] Impl | Stemmed representation
+7f2c4bd [:b] Ref | hi
+39f881c [:a] Impl | echo
+4063a8e (tag: base) [:README] Impl | Yo
+c9bd056 [:README] Impl |
+```
+
+... instead of this
+
+```
+> git log --all --decorate --oneline
+
+e01f0cc (HEAD -> master) Minor changes (9999 files)
+c9bd056 Initial message. Thank God, it finally works!!11
+```
+
+# Installation
 
 # Acknowledgements
 
