@@ -140,12 +140,12 @@ def _cli_get_file_module(file_path: str) -> str:
     return selected_option
 
 
-def _cli_get_commit_type() -> str
+def _cli_get_commit_type() -> str:
     commit_types = [
         "[b] Bug",  # Fixed some bug
-        "[i] Impl"  # Implementation (added new feature)
+        "[i] Impl",  # Implementation (added new feature)
         "[e] Enh",  # Enhancement / optimization (changed / optimized old feature)
-        "[r] Ref"  # Made refactoring
+        "[r] Ref",  # Made refactoring
         "[u] Build",  # Build system / project management tweaks
         "[d] Doc",  # Updated documentation
     ]
