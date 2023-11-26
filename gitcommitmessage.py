@@ -132,6 +132,9 @@ def file_path_decompose(file_path: str):
 def _cli_get_file_module(file_path: str) -> str:
     options = pathlib.Path(file_path).parts
 
+    # File name itself is not needed
+    options = options[:-1]
+
     if len(options) == 0:
         return ""
 
