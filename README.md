@@ -35,6 +35,11 @@ e01f0cc (HEAD -> master) Minor changes (9999 files)
 c9bd056 Initial message. Thank God, it finally works!!11
 ```
 
+# Requirements
+
+- Vim (for file-mediated prompt);
+- Linux (for complete and vibrant life);
+
 # Installation
 
 ## From Github
