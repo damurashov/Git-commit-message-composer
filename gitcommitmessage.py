@@ -23,6 +23,7 @@ OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
 
 def _git_stash_unstaged_files():
     tired.command.execute("git stash -k -u")
+    tired.command.execute("git reset")
 
 
 def _git_unstash():
