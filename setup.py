@@ -28,6 +28,7 @@ setup(
     python_requires=">=3.7",
     version="1.0.0",
     entry_points="""
+        [console_scripts]
         gico = gico.gico:main
     """
 )
