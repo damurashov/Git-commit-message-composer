@@ -114,7 +114,7 @@ class Execution:
                 module_representation_map[module_name] = MODULE_CONTENT_STEM_SYMBOL
 
                 if OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS:
-                    self.execute_commit(module_representation_map)
+                    self.execute_commit(module_representation_map)  # TODO watabout other files
                     module_representation_map = dict()
             else:
                 for file in self._module_map[module_name]:
