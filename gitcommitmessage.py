@@ -71,40 +71,7 @@ class Staged:
 
 
 class FormattingStrategy:
-    pass
-
-
-class CommitContent:
-    def __init__(self) -> None:
-        self._modulemap = dict()
-
-    def add_file(self, module_name, file: File):
-        if module_name not in self._modulemap:
-            self._modulemap[module_name] = list()
-
-        self._modulemap[module_name].append(file)
-
-    def get_module_map(self):
-        return self._modulemap
-
-    def is_empty(self):
-        return len(self._modulemap.values()) == 0
-
-class Execution:
-    """
-    Executes sequential commits
-    """
-
-    def __init__(self, staged: Staged):
-        # All staged files
-        self._module_map = staged.get_module_map()
-        self._commit_queue = list()
-
-    def _add_commit(self, commit_content: CommitContent):
-        self._commit_queue.append(copy.copy(commit_content))
-
-    @staticmethod
-    def format_commit_message(commit_content: CommitContent):
+    def format_commit_content(self, commit_content):
         module_representation_map = commit_content.get_module_map()
 
         commit_message = '['
@@ -136,14 +103,45 @@ class Execution:
 
         return commit_message
 
-    @staticmethod
-    def execute_commit(commit_content: CommitContent):
+
+
+class CommitContent:
+    def __init__(self) -> None:
+        self._modulemap = dict()
+
+    def add_file(self, module_name, file: File):
+        if module_name not in self._modulemap:
+            self._modulemap[module_name] = list()
+
+        self._modulemap[module_name].append(file)
+
+    def get_module_map(self):
+        return self._modulemap
+
+    def is_empty(self):
+        return len(self._modulemap.values()) == 0
+
+class Execution:
+    """
+    Executes sequential commits
+    """
+
+    def __init__(self, staged: Staged):
+        # All staged files
+        self._module_map = staged.get_module_map()
+        self._commit_queue = list()
+        self._formatting_strategy = FormattingStrategy()
+
+    def _add_commit(self, commit_content: CommitContent):
+        self._commit_queue.append(copy.copy(commit_content))
+
+    def execute_commit(self, commit_content: CommitContent):
         if commit_content.is_empty():
             tired.logging.warning("Empty commit, skipping")
 
             return
 
-        commit_message = Execution.format_commit_message(commit_content)
+        commit_message = self._formatting_strategy.format_commit_content(commit_content)
 
         for file_paths in commit_content.get_module_map().values():
             for file_path in file_paths:
@@ -178,7 +176,7 @@ class Execution:
         tired.logging.info("Executing commit queue")
 
         for commit_content in self._commit_queue:
-            Execution.execute_commit(commit_content)
+            self.execute_commit(commit_content)
 
     def run(self):
         self._build_commit_queue()
