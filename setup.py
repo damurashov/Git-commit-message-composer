@@ -27,10 +27,8 @@ setup(
     ],
     python_requires=">=3.7",
     version="1.0.0",
-    console_scripts={
-        'console_scripts': [
-            'gico = gico.gico:main'
-        ]
-    }
+    entry_points="""
+        gico = gico.gico:main
+    """
 )
 
