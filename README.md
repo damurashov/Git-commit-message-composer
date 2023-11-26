@@ -37,6 +37,16 @@ c9bd056 Initial message. Thank God, it finally works!!11
 
 # Installation
 
+## From Github
+
+```
+pip install git+https://github.com/damurashov/Git-commit-message-composer.git@latest
+```
+
+## From PyPi
+
+It might actually be published on PyPi. At the appropriate juncture. In the fullness of time.
+
 # Acknowledgements
 
 - Simple-term-menu, https://github.com/IngoMeyer441/simple-term-menu
