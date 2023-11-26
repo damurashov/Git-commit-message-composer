@@ -185,7 +185,7 @@ def main():
     try:
         commit_type = _cli_get_commit_type()
 
-        for staged_file_path in tired.git.get_staged_file_names():
+        for staged_file_path in tired.git.get_staged_file_paths():
             module = _cli_get_file_module(staged_file_path)
             staged.add_file(module, staged_file_path)
 
