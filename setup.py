@@ -26,7 +26,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.7",
-    version="1.0.1",
+    version="1.0.2",
     entry_points="""
         [console_scripts]
         gico = gico.gico:main
