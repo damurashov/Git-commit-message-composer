@@ -57,3 +57,8 @@ It might actually be published on PyPi. At the appropriate juncture. In the full
 - Simple-term-menu, https://github.com/IngoMeyer441/simple-term-menu
 - Shlex, https://docs.python.org/3/library/shlex.html
 - Tired https://pypi.org/project/tired/. This library is one big boilerplate, and its good!
+
+# Known limitations
+
+- It does not handle renames well (yet);
+- It only works from git root, launching it from nested directories will fail
