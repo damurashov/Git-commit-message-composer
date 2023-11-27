@@ -27,7 +27,7 @@ OPTION_USE_COMMON_COMMIT_TYPE = True
 
 
 def _git_stash_unstaged_files():
-    tired.command.execute("git stash -k -u")
+    tired.command.execute("git stash -k")
 
 
 def _git_unstash():
