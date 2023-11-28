@@ -61,7 +61,6 @@ It might actually be published on PyPi. At the appropriate juncture. In the full
 # Known limitations
 
 - It does not handle renames well (yet);
-- When being launched from a nested directory, it narrows module selection;
 
 # Announced features
 
