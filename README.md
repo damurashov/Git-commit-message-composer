@@ -45,7 +45,7 @@ c9bd056 Initial message. Thank God, it finally works!!11
 ## From Github
 
 ```
-pip install git+https://github.com/damurashov/Git-commit-message-composer.git -U --force
+pip install git+https://github.com/damurashov/Git-commit-message-composer.git@main -U --force
 ```
 
 ## From PyPi
