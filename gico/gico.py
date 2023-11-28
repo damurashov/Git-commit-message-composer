@@ -270,7 +270,7 @@ def main():
 
         tired.logging.debug(f"Staged files: {list(tired.git.get_staged_file_paths())}")
 
-        for staged_file_path in tired.git.get_staged_file_paths():
+        for staged_file_path in tired.git.get_staged_file_paths(True):
             if not OPTION_USE_COMMON_COMMIT_TYPE:
                 commit_type = _cli_get_commit_type(staged_file_path)
 
