@@ -18,7 +18,7 @@ setup(
     author="Dmitry Murashov",
     setup_requires=["wheel"],
     install_requires=[
-        "tired==0.3.2"
+        "tired>=0.3.2"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
