@@ -1,1 +1,1 @@
-tired @ git+https://github.com/damurashov/TIRED.git@dev
+tired @ git+https://github.com/damurashov/TIRED.git@master
