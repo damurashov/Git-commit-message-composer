@@ -18,7 +18,7 @@ setup(
     author="Dmitry Murashov",
     setup_requires=["wheel"],
     install_requires=[
-        "tired>=0.3.2"
+        "tired @ git+https://github.com/damurashov/TIRED.git@master",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
