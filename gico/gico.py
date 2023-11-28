@@ -8,6 +8,7 @@
 import argparse
 import copy
 import dataclasses
+import os
 import pathlib
 import tired.command
 import tired.git
@@ -255,11 +256,12 @@ def main():
     # Only apply changes that are staged (useful, since we operate with file names)
     _parse_arguments()
     _git_stash_unstaged_files()
-
-
     staged = Staged()
 
     try:
+        # Change PWD to git root directory. This is the simplest, and the most reliable way to handle relative paths
+        os.chdir(tired.git.get_git_directory_from_nested_context())
+
         # Specify commit type for all messages, if appropriate
         if OPTION_USE_COMMON_COMMIT_TYPE:
             commit_type = _cli_get_commit_type()
