@@ -153,7 +153,9 @@ class Execution:
                 tired.command.execute(f"git add \"{file_path.full_path}\"")
 
         if OPTION_USE_COMMON_COMMIT_MESSAGE:
-            tired.command.execute(f"git commit -m '{commit_message}{COMMON_COMMIT_MESSAGE}'")
+            # Commit through use of intermediate file to improve reliability
+            screened_sequence_common_message = COMMON_COMMIT_MESSAGE.replace("'", "\\'")
+            tired.command.execute(f"git commit -m '{commit_message}{screened_sequence_common_message}'")
         else:
             tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message, False)
             tired.command.execute(f"git commit --file \"{COMMIT_MESSAGE_TEMPORARY_FILE_NAME}\"")
