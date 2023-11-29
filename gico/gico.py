@@ -49,7 +49,7 @@ def _git_commit(commit_message):
     File-mediated commit to fix the problem with escape sequences
     """
     with open(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME, 'w') as f:
-        f.write(message)
+        f.write(commit_message)
 
     tired.command.execute(f"git commit --file {GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME}")
     os.remove(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME)
