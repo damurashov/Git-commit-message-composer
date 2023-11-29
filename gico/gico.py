@@ -155,7 +155,7 @@ class Execution:
         if OPTION_USE_COMMON_COMMIT_MESSAGE:
             tired.command.execute(f"git commit -m '{commit_message}{COMMON_COMMIT_MESSAGE}'")
         else:
-            tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message)
+            tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message, False)
             tired.command.execute(f"git commit --file \"{COMMIT_MESSAGE_TEMPORARY_FILE_NAME}\"")
 
     def _build_commit_queue(self):
