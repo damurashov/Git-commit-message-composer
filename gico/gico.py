@@ -267,7 +267,7 @@ def main():
 
         # Specify commit message for each file
         if OPTION_USE_COMMON_COMMIT_MESSAGE:
-            COMMON_COMMIT_MESSAGE = tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, "Erase this, and type in your commit message")
+            COMMON_COMMIT_MESSAGE = tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, "Erase this, and type in your commit message", False)
 
         tired.logging.debug(f"Staged files: {list(tired.git.get_staged_file_paths())}")
 
