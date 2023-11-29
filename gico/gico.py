@@ -20,11 +20,14 @@ OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = False
 OPTION_STEM_MODULE_DETAILS = False
 OPTION_KEEP_EXTENSION = False
 MODULE_CONTENT_STEM_SYMBOL = "*"
-COMMIT_MESSAGE_TEMPORARY_FILE_NAME = ".commitmsg_deleteme"
+COMMIT_MESSAGE_TEMPORARY_FILE_NAME = ".commitmsg"
 OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
 OPTION_USE_COMMON_COMMIT_MESSAGE = True
 COMMON_COMMIT_MESSAGE = None
 OPTION_USE_COMMON_COMMIT_TYPE = True
+
+# Same as `COMMIT_MESSAGE_TEMPORARY_FILE_NAME`, but with header. Can be considered "garbaged" file
+GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME = ".commitmsg_deleteme"
 
 
 def _git_stash_unstaged_files():
@@ -39,6 +42,17 @@ def _git_unstash():
 
 def _git_unstage_all_files():
     tired.command.execute("git reset")
+
+
+def _git_commit(commit_message):
+    """
+    File-mediated commit to fix the problem with escape sequences
+    """
+    with open(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME, 'w') as f:
+        f.write(message)
+
+    tired.command.execute(f"git commit --file {GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME}")
+    os.remove(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME)
 
 
 @dataclasses.dataclass
@@ -153,12 +167,11 @@ class Execution:
                 tired.command.execute(f"git add \"{file_path.full_path}\"")
 
         if OPTION_USE_COMMON_COMMIT_MESSAGE:
-            # Commit through use of intermediate file to improve reliability
-            screened_sequence_common_message = COMMON_COMMIT_MESSAGE.replace("'", "\\\\'")
-            tired.command.execute(f"git commit -m '{commit_message}{screened_sequence_common_message}'")
+            # Commit through use of intermediate garbaged file to improve reliability
+            _git_commit(f"{commit_message}{COMMON_COMMIT_MESSAGE}")
         else:
-            tired.ui.get_input_using_temporary_file(COMMIT_MESSAGE_TEMPORARY_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message, False)
-            tired.command.execute(f"git commit --file \"{COMMIT_MESSAGE_TEMPORARY_FILE_NAME}\"")
+            tired.ui.get_input_using_temporary_file(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message, True)
+            tired.command.execute(f"git commit --file \"{GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME}\"")
 
     def _build_commit_queue(self):
         tired.logging.info("Building commit queue")
