@@ -58,9 +58,10 @@ It might actually be published on PyPi. At the appropriate juncture. In the full
 - Shlex, https://docs.python.org/3/library/shlex.html
 - Tired https://pypi.org/project/tired/. This library is one big boilerplate, and its good!
 
-# Known limitations
+# Known limitations / issues
 
 - It does not handle renames well (yet);
+- Sometimes, it does not stem header and source into the same name
 
 # Announced features
 
