@@ -56,6 +56,12 @@ pip install git+https://github.com/damurashov/Git-commit-message-composer.git@ma
 python3 -m pip install gico -U --force
 ```
 
+### I have this fancy new python 3.11 with "walruses", and stuff
+
+```
+python3 -m pip install gico -U --force --break-system-packages
+```
+
 # Acknowledgements
 
 - Simple-term-menu, https://github.com/IngoMeyer441/simple-term-menu
