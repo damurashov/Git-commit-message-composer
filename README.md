@@ -50,7 +50,11 @@ pip install git+https://github.com/damurashov/Git-commit-message-composer.git@ma
 
 ## From PyPi
 
-It might actually be published on PyPi. At the appropriate juncture. In the fullness of time.
+~~It might actually be published on PyPi. At the appropriate juncture. In the fullness of time.~~
+
+```
+python3 -m pip install gico -U --force
+```
 
 # Acknowledgements
 
