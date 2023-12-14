@@ -111,7 +111,7 @@ class FormattingStrategy:
                 tired.logging.debug("Stemming module details")
                 commit_message += MODULE_CONTENT_STEM_SYMBOL
             else:
-                commit_message += ','.join(i.get_representation() for i in module_representation_map[module_name])
+                commit_message += ','.join(set(i.get_representation() for i in module_representation_map[module_name]))
 
             commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
 
