@@ -70,8 +70,6 @@ python3 -m pip install gico -U --force --break-system-packages
 
 # Known limitations / issues
 
-- It does not handle renames well (yet);
-
 # Announced features
 
 - Cache previous selection for file-module associations;
