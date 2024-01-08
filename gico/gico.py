@@ -286,12 +286,15 @@ def main():
 
         tired.logging.debug(f"Staged files: {list(tired.git.get_staged_file_paths())}")
 
-        for staged_file_path in tired.git.get_staged_file_paths(True):
+        for staged_file in tired.git.get_staged_status(True):
             if not OPTION_USE_COMMON_COMMIT_TYPE:
-                commit_type = _cli_get_commit_type(staged_file_path)
+                commit_type = _cli_get_commit_type(staged_file.path)
 
-            module = _cli_get_file_module(staged_file_path)
-            staged.add_file(module, staged_file_path, commit_type)
+            module = _cli_get_file_module(staged_file.path)
+            staged.add_file(module, staged_file.path, commit_type)
+
+            if staged_file.new_path:
+                staged.add_file(module, staged_file.new_path, commit_type)
 
         # Unstage files. Each file will be staged separately
         _git_unstage_all_files()
