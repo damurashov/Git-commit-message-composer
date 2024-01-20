@@ -11,6 +11,7 @@ import dataclasses
 import os
 import pathlib
 import tired.command
+import tired.env
 import tired.git
 import tired.logging
 import tired.ui
@@ -25,6 +26,7 @@ OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
 OPTION_USE_COMMON_COMMIT_MESSAGE = True
 COMMON_COMMIT_MESSAGE = None
 OPTION_USE_COMMON_COMMIT_TYPE = True
+USE_CACHE = True
 
 # Same as `COMMIT_MESSAGE_TEMPORARY_FILE_NAME`, but with header. Can be considered "garbaged" file
 GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME = ".commitmsg_deleteme"
@@ -209,8 +211,46 @@ def file_path_decompose(file_path: str):
     return pathlib.Path(file_path).parts
 
 
+class ModuleCache(tired.env.ApplicationConfig):
+
+    def __init__(self):
+        tired.env.ApplicationConfig.__init__(self, "gico", ".modulecache")
+
+    def try_get_entry(self, path):
+        path = pathlib.Path(path).resolve()
+        entry = self.get_field(str(path))
+
+        # Try to infer from the file's directory
+        if entry is None:
+            entry = self.get_field(str(path.parent))
+
+        return entry
+
+    def save_entry(self, path, value):
+        path = pathlib.Path(path).resolve()
+
+        # Add file entry
+        self.set_field(str(path), value)
+
+        # Add the corresponding directory's entry
+        self.set_field(str(path.parent), value)
+        self.sync()
+
+
 def _cli_get_file_module(file_path: str) -> str:
+    global USE_CACHE
+
     options = pathlib.Path(file_path).parts
+    cache = ModuleCache()
+
+    # Initialize module cache, try to get cached value
+    if USE_CACHE:
+        value = cache.try_get_entry(file_path)
+
+        if value is not None:
+            return value
+
+    # Cache request went empty, use the user's assistance
 
     # File name itself is not needed
     options = options[:-1]
@@ -220,6 +260,9 @@ def _cli_get_file_module(file_path: str) -> str:
 
     option_id = tired.ui.select(options, file_path)
     selected_option = options[option_id]
+
+    # Save the value into cache
+    cache.save_entry(file_path, selected_option)
 
     return selected_option
 
