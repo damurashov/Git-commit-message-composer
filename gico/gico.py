@@ -288,6 +288,7 @@ def _parse_arguments():
     global OPTION_KEEP_EXTENSION
     global OPTION_USE_COMMON_COMMIT_MESSAGE
     global OPTION_USE_COMMON_COMMIT_TYPE
+    global USE_CACHE
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
@@ -295,6 +296,7 @@ def _parse_arguments():
     parser.add_argument("--ext", action="store_true", help="Keep file extension")
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
     parser.add_argument("--typ", action="store_false", help="Use individual commit type for each file")
+    parser.add_argument("--nomodcache", action="store_true", help="Do not use cache when determinining a file's module")
     p = parser.parse_args()
 
     OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = p.sep
@@ -302,6 +304,7 @@ def _parse_arguments():
     OPTION_KEEP_EXTENSION = p.ext
     OPTION_USE_COMMON_COMMIT_MESSAGE = p.mes
     OPTION_USE_COMMON_COMMIT_TYPE = p.typ
+    USE_CACHE = not p.nomodcache
 
     return p
 
