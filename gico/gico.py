@@ -3,7 +3,6 @@
 # TODO: option to make it to ask for a change type for each file being added
 # into the commit
 # TODO: Snippets
-# TODO: Handle renames
 
 import argparse
 import copy
@@ -124,6 +123,41 @@ class FormattingStrategy:
         return commit_message
 
 
+class StemNoGlobFormattingStrategy:
+    def format_commit_content(self, commit_content):
+        module_representation_map = commit_content.get_module_map()
+
+        commit_message = '['
+        commit_types = set()
+
+        # State machine quirks
+        is_first = True
+
+        for module_name in module_representation_map.keys():
+            if is_first:
+                is_first = False
+            else:
+                commit_message += ' '
+
+            commit_message += module_name
+
+            if not OPTION_STEM_MODULE_DETAILS:
+                commit_message += ':'
+
+            if OPTION_STEM_MODULE_DETAILS:
+                tired.logging.debug("Stemming module details")
+            else:
+                commit_message += ','.join(set(i.get_representation() for i in module_representation_map[module_name]))
+
+            commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
+
+        commit_message += "] "
+        commit_message += ' '.join(commit_types)
+        commit_message += ' | '
+
+        return commit_message
+
+
 
 class CommitContent:
     def __init__(self) -> None:
@@ -150,7 +184,7 @@ class Execution:
         # All staged files
         self._module_map = staged.get_module_map()
         self._commit_queue = list()
-        self._formatting_strategy = FormattingStrategy()
+        self._formatting_strategy = StemNoGlobFormattingStrategy()
 
     def _add_commit(self, commit_content: CommitContent):
         self._commit_queue.append(copy.copy(commit_content))
