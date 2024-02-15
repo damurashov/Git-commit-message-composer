@@ -175,6 +175,7 @@ class CommitContent:
     def is_empty(self):
         return len(self._modulemap.values()) == 0
 
+
 class Execution:
     """
     Executes sequential commits
