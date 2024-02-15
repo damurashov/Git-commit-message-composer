@@ -224,7 +224,7 @@ class Execution:
                     self._add_commit(commit_content)
                     commit_content = CommitContent()
 
-            if should_commit_after_module:
+            if should_commit_after_module and not commit_content.is_empty():
                 self._add_commit(commit_content)
                 commit_content = CommitContent()
 
