@@ -27,6 +27,12 @@ COMMON_COMMIT_MESSAGE = None
 OPTION_USE_COMMON_COMMIT_TYPE = True
 USE_CACHE = True
 
+OPTION_SAVE_FILE_DIRECTORY_IN_CACHE = True
+"""
+Along with the file itself, save the directory it pertains to into the cache,
+so the new files from that directory get their module inferred automatically.
+"""
+
 # Same as `COMMIT_MESSAGE_TEMPORARY_FILE_NAME`, but with header. Can be considered "garbaged" file
 GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME = ".commitmsg_deleteme"
 
@@ -262,13 +268,17 @@ class ModuleCache(tired.env.ApplicationConfig):
         return entry
 
     def save_entry(self, path, value):
+        global OPTION_SAVE_FILE_DIRECTORY_IN_CACHE
+
         path = pathlib.Path(path).resolve()
 
         # Add file entry
         self.set_field(str(path), value)
 
-        # Add the corresponding directory's entry
-        self.set_field(str(path.parent), value)
+        if OPTION_SAVE_FILE_DIRECTORY_IN_CACHE:
+            # Add the corresponding directory entry
+            self.set_field(str(path.parent), value)
+
         self.sync()
 
 
