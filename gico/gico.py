@@ -11,6 +11,7 @@ import os
 import pathlib
 import tired.command
 import tired.env
+import tired.fs
 import tired.git
 import tired.logging
 import tired.ui
@@ -20,7 +21,7 @@ OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = False
 OPTION_STEM_MODULE_DETAILS = False
 OPTION_KEEP_EXTENSION = False
 MODULE_CONTENT_STEM_SYMBOL = "*"
-COMMIT_MESSAGE_TEMPORARY_FILE_NAME = ".commitmsg"
+COMMIT_MESSAGE_TEMPORARY_FILE_NAME = str((pathlib.Path(tired.fs.get_platform_config_directory_path()) / ".gicocommitmsg").resolve())
 OPTION_FILE_MEDIATED_INPUT_EDITOR = "vim"
 OPTION_USE_COMMON_COMMIT_MESSAGE = True
 COMMON_COMMIT_MESSAGE = None
