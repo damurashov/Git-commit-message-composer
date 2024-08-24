@@ -19,6 +19,7 @@ import tired.ui
 
 OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = False
 OPTION_STEM_MODULE_DETAILS = False
+OPTION_NO_MODULE_PREFIX = False
 OPTION_KEEP_EXTENSION = False
 MODULE_CONTENT_STEM_SYMBOL = "*"
 COMMIT_MESSAGE_TEMPORARY_FILE_NAME = str((pathlib.Path(tired.fs.get_platform_config_directory_path()) / ".gicocommitmsg").resolve())
@@ -113,14 +114,18 @@ class FormattingStrategy:
             else:
                 commit_message += ' '
 
-            commit_message += module_name
-            commit_message += ':'
+            if not OPTION_NO_MODULE_PREFIX:
+                commit_message += module_name
+                commit_message += ':'
 
             if OPTION_STEM_MODULE_DETAILS:
                 tired.logging.debug("Stemming module details")
                 commit_message += MODULE_CONTENT_STEM_SYMBOL
             else:
-                commit_message += ','.join(set(i.get_representation() for i in module_representation_map[module_name]))
+                if not OPTION_NO_MODULE_PREFIX:
+                    commit_message += ','.join(set(i.get_representation() for i in module_representation_map[module_name]))
+                else:
+                    commit_message += ' '.join(set(i.get_representation() for i in module_representation_map[module_name]))
 
             commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
 
@@ -133,6 +138,7 @@ class FormattingStrategy:
 
 class StemNoGlobFormattingStrategy:
     def format_commit_content(self, commit_content):
+        global OPTION_NO_MODULE_PREFIX
         module_representation_map = commit_content.get_module_map()
 
         commit_message = '['
@@ -142,23 +148,29 @@ class StemNoGlobFormattingStrategy:
         is_first = True
 
         for module_name in module_representation_map.keys():
+            # compose MODULE_NAME:FILE1,FILE2
             if is_first:
                 is_first = False
             else:
                 commit_message += ' '
 
-            commit_message += module_name
+            if not OPTION_NO_MODULE_PREFIX:
+                commit_message += module_name
 
-            if not OPTION_STEM_MODULE_DETAILS:
-                commit_message += ':'
+                if not OPTION_STEM_MODULE_DETAILS:
+                    commit_message += ':'
 
             if OPTION_STEM_MODULE_DETAILS:
                 tired.logging.debug("Stemming module details")
             else:
-                commit_message += ','.join(set(i.get_representation() for i in module_representation_map[module_name]))
+                if not OPTION_NO_MODULE_PREFIX:
+                    commit_message += ','.join(set(i.get_representation() for i in module_representation_map[module_name]))
+                else:
+                    commit_message += ' '.join(set(i.get_representation() for i in module_representation_map[module_name]))
 
             commit_types = commit_types.union({i.commit_type for i in module_representation_map[module_name]})
 
+        # compose [MODULE1:FILE1,FILE2 MODULE2:FILE1,FILE2]
         commit_message += "] "
         commit_message += ' '.join(commit_types)
         commit_message += ' | '
@@ -334,6 +346,7 @@ def _cli_get_commit_type(file_name="") -> str:
 def _parse_arguments():
     global OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS
     global OPTION_STEM_MODULE_DETAILS
+    global OPTION_NO_MODULE_PREFIX
     global OPTION_KEEP_EXTENSION
     global OPTION_USE_COMMON_COMMIT_MESSAGE
     global OPTION_USE_COMMON_COMMIT_TYPE
@@ -343,6 +356,7 @@ def _parse_arguments():
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
     parser.add_argument("--stem", action="store_true", help="If true, module components will not be comma-enumerated, but replaced w/ * symbol")
     parser.add_argument("--ext", action="store_true", help="Keep file extension")
+    parser.add_argument("--nop", action="store_true", help="No module prefix")
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
     parser.add_argument("--typ", action="store_false", help="Use individual commit type for each file")
     parser.add_argument("--nomodcache", action="store_true", help="Do not use cache when determinining a file's module")
@@ -353,6 +367,7 @@ def _parse_arguments():
     OPTION_KEEP_EXTENSION = p.ext
     OPTION_USE_COMMON_COMMIT_MESSAGE = p.mes
     OPTION_USE_COMMON_COMMIT_TYPE = p.typ
+    OPTION_NO_MODULE_PREFIX = p.nop
     USE_CACHE = not p.nomodcache
 
     return p
@@ -362,6 +377,7 @@ def main():
     global OPTION_USE_COMMON_COMMIT_MESSAGE
     global COMMON_COMMIT_MESSAGE
     global OPTION_USE_COMMON_COMMIT_TYPE
+    global OPTION_NO_MODULE_PREFIX
     # Only apply changes that are staged (useful, since we operate with file names)
     _parse_arguments()
     _git_stash_unstaged_files()
