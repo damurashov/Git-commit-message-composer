@@ -29,6 +29,7 @@ COMMON_COMMIT_MESSAGE = None
 OPTION_USE_COMMON_COMMIT_TYPE = True
 USE_CACHE = True
 OPTION_CONSIDER_FILENAME_MODULE = False
+OPTION_CUSTOM_FILE_MODULE = None
 
 OPTION_SAVE_FILE_DIRECTORY_IN_CACHE = True
 """
@@ -298,12 +299,19 @@ class ModuleCache(tired.env.ApplicationConfig):
 
 def _cli_get_file_module(file_path: str) -> str:
     global USE_CACHE
+    global OPTION_CUSTOM_FILE_MODULE
+    print(OPTION_CUSTOM_FILE_MODULE)
 
     options = pathlib.Path(file_path).parts
     cache = ModuleCache()
 
-    # Initialize module cache, try to get cached value
-    if USE_CACHE:
+    if OPTION_CUSTOM_FILE_MODULE is not None:
+        value = OPTION_CUSTOM_FILE_MODULE
+        cache.save_entry(file_path, value)
+
+        return value
+    elif USE_CACHE:
+        # Initialize module cache, try to get cached value
         value = cache.try_get_entry(file_path)
 
         if value is not None:
@@ -351,6 +359,7 @@ def _parse_arguments():
     global OPTION_USE_COMMON_COMMIT_MESSAGE
     global OPTION_USE_COMMON_COMMIT_TYPE
     global USE_CACHE
+    global OPTION_CUSTOM_FILE_MODULE
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
@@ -360,6 +369,7 @@ def _parse_arguments():
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
     parser.add_argument("--typ", action="store_false", help="Use individual commit type for each file")
     parser.add_argument("--nomodcache", action="store_true", help="Do not use cache when determinining a file's module")
+    parser.add_argument("--mod", type=str, default=None, help="Custom module name")
     p = parser.parse_args()
 
     OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = p.sep
@@ -369,6 +379,7 @@ def _parse_arguments():
     OPTION_USE_COMMON_COMMIT_TYPE = p.typ
     OPTION_NO_MODULE_PREFIX = p.nop
     USE_CACHE = not p.nomodcache
+    OPTION_CUSTOM_FILE_MODULE = p.mod
 
     return p
 
