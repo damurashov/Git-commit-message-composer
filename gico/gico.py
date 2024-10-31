@@ -28,7 +28,7 @@ OPTION_USE_COMMON_COMMIT_MESSAGE = True
 COMMON_COMMIT_MESSAGE = None
 OPTION_USE_COMMON_COMMIT_TYPE = True
 USE_CACHE = True
-OPTION_CONSIDER_FILENAME_MODULE = False
+OPTION_CONSIDER_FILENAME_MODULE = True
 OPTION_CUSTOM_FILE_MODULE = None
 
 OPTION_SAVE_FILE_DIRECTORY_IN_CACHE = True
@@ -320,9 +320,8 @@ def _cli_get_file_module(file_path: str) -> str:
     # Cache request went empty, use the user's assistance
 
     # File name itself may not be needed
-    options = options[:-1]
     if OPTION_CONSIDER_FILENAME_MODULE:
-        pass
+        options = options[:-1]
 
     if len(options) == 0:
         return ""
