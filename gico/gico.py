@@ -300,18 +300,20 @@ class ModuleCache(tired.env.ApplicationConfig):
 def _cli_get_file_module(file_path: str) -> str:
     global USE_CACHE
     global OPTION_CUSTOM_FILE_MODULE
+    global OPTION_CONSIDER_FILENAME_MODULE
     print(OPTION_CUSTOM_FILE_MODULE)
 
-    options = pathlib.Path(file_path).parts
+    options = list(pathlib.Path(file_path).parts)
     cache = ModuleCache()
 
     if OPTION_CUSTOM_FILE_MODULE is not None:
+        # Use custom file module
         value = OPTION_CUSTOM_FILE_MODULE
         cache.save_entry(file_path, value)
 
         return value
     elif USE_CACHE:
-        # Initialize module cache, try to get cached value
+        # Initialize module cache, try to load from cache
         value = cache.try_get_entry(file_path)
 
         if value is not None:
@@ -319,9 +321,12 @@ def _cli_get_file_module(file_path: str) -> str:
 
     # Cache request went empty, use the user's assistance
 
-    # File name itself may not be needed
-    if OPTION_CONSIDER_FILENAME_MODULE:
+    if not OPTION_CONSIDER_FILENAME_MODULE:
+        # File name itself is not needed
         options = options[:-1]
+    else:
+        # Use filename as an option, remove extension
+        options[-1] = options[-1].split('.')[0]
 
     if len(options) == 0:
         return ""
