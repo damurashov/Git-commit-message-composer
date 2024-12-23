@@ -367,7 +367,7 @@ def _parse_arguments():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
-    parser.add_argument("--stem", action="store_true", help="If true, module components will not be comma-enumerated, but replaced w/ * symbol")
+    parser.add_argument("--nostem", action="store_true", help="If true, module components will be comma-enumerated")
     parser.add_argument("--ext", action="store_true", help="Keep file extension")
     parser.add_argument("--nop", action="store_true", help="No module prefix")
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
@@ -377,7 +377,7 @@ def _parse_arguments():
     p = parser.parse_args()
 
     OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = p.sep
-    OPTION_STEM_MODULE_DETAILS = p.stem
+    OPTION_STEM_MODULE_DETAILS = not p.nostem
     OPTION_KEEP_EXTENSION = p.ext
     OPTION_USE_COMMON_COMMIT_MESSAGE = p.mes
     OPTION_USE_COMMON_COMMIT_TYPE = p.typ
