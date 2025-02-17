@@ -30,8 +30,8 @@ OPTION_USE_COMMON_COMMIT_TYPE = True
 USE_CACHE = True
 OPTION_CONSIDER_FILENAME_MODULE = True
 OPTION_CUSTOM_FILE_MODULE = None
-
 OPTION_SAVE_FILE_DIRECTORY_IN_CACHE = True
+OPTION_DRY_RUN = False
 """
 Along with the file itself, save the directory it pertains to into the cache,
 so the new files from that directory get their module inferred automatically.
@@ -42,16 +42,22 @@ GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME = ".commitmsg_deleteme"
 
 
 def _git_stash_unstaged_files():
+    if OPTION_DRY_RUN:
+        return
     tired.command.execute("git stash -k")
 
 
 def _git_unstash():
+    if OPTION_DRY_RUN:
+        return
     tired.logging.info("Restoring staged files")
     # tired.command.execute("git checkout stash@{0} --theirs .")
     tired.command.execute("git restore --source=stash@{0} --worktree .")
 
 
 def _git_unstage_all_files():
+    if OPTION_DRY_RUN:
+        return
     tired.command.execute("git reset")
 
 
@@ -61,6 +67,9 @@ def _git_commit(commit_message):
     """
     with open(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME, 'w') as f:
         f.write(commit_message)
+
+    if OPTION_DRY_RUN:
+        return
 
     tired.command.execute(f"git commit --file {GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME}")
     os.remove(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME)
@@ -221,6 +230,8 @@ class Execution:
 
         for file_paths in commit_content.get_module_map().values():
             for file_path in file_paths:
+                if OPTION_DRY_RUN:
+                    continue
                 tired.logging.debug(f"Adding file {file_path.full_path}")
                 tired.command.execute(f"git add \"{file_path.full_path}\"")
 
@@ -229,7 +240,8 @@ class Execution:
             _git_commit(f"{commit_message}{COMMON_COMMIT_MESSAGE}")
         else:
             tired.ui.get_input_using_temporary_file(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME, OPTION_FILE_MEDIATED_INPUT_EDITOR, commit_message, True)
-            tired.command.execute(f"git commit --file \"{GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME}\"")
+            if not OPTION_DRY_RUN:
+                tired.command.execute(f"git commit --file \"{GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME}\"")
 
     def _build_commit_queue(self):
         tired.logging.info("Building commit queue")
@@ -364,6 +376,7 @@ def _parse_arguments():
     global OPTION_USE_COMMON_COMMIT_TYPE
     global USE_CACHE
     global OPTION_CUSTOM_FILE_MODULE
+    global OPTION_DRY_RUN
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sep", action="store_true", help="Push each dir:module pair as a separate commit under the same name")
@@ -372,8 +385,9 @@ def _parse_arguments():
     parser.add_argument("--nop", action="store_true", help="No module prefix")
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
     parser.add_argument("--typ", action="store_false", help="Use individual commit type for each file")
-    parser.add_argument("--nomodcache", action="store_true", help="Do not use cache when determinining a file's module")
+    parser.add_argument("--nomodcache", '-n', action="store_true", help="Do not use cache when determinining a file's module")
     parser.add_argument("--mod", type=str, default=None, help="Custom module name")
+    parser.add_argument("--dry", '-d', action="store_true", help="Do not change index, do not commit")
     p = parser.parse_args()
 
     OPTION_SEPARATE_MODULE_FILE_PAIRS_BETWEEN_COMMITS = p.sep
@@ -384,6 +398,7 @@ def _parse_arguments():
     OPTION_NO_MODULE_PREFIX = p.nop
     USE_CACHE = not p.nomodcache
     OPTION_CUSTOM_FILE_MODULE = p.mod
+    OPTION_DRY_RUN = p.dry
 
     return p
 
