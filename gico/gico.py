@@ -343,7 +343,8 @@ def _cli_get_file_module(file_path: str) -> str:
     if len(options) == 0:
         return ""
 
-    option_id = tired.ui.select(options, file_path)
+    options = list(filter(len, options))
+    option_id = tired.ui.select(options, file_path, optimize_obvious_selection=False)
     selected_option = options[option_id]
 
     # Save the value into cache
