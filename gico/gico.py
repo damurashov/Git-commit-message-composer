@@ -344,8 +344,11 @@ def _cli_get_file_module(file_path: str) -> str:
         return ""
 
     options = list(filter(len, options))
-    option_id = tired.ui.select(options, file_path, optimize_obvious_selection=False)
-    selected_option = options[option_id]
+    if len(options) == 0:
+        selected_option = ""
+    else:
+        option_id = tired.ui.select(options, file_path, optimize_obvious_selection=False)
+        selected_option = options[option_id]
 
     # Save the value into cache
     cache.save_entry(file_path, selected_option)
