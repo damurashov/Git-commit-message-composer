@@ -448,6 +448,7 @@ def main():
         execution.run()
     finally:
         _git_unstash()
+        os.remove(GIT_COMMIT_MESSAGE_WITH_META_FILE_NAME)
 
 
 if __name__ == "__main__":
