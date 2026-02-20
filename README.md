@@ -70,7 +70,8 @@ python3 -m pip install gico -U --force --break-system-packages
 
 # Known limitations / issues
 
-# Announced features
+# Coming soon
 
-- Cache previous selection for file-module associations;
-- Cache messages for further reuse;
+- `[doc]` is a sufficient topic of its own;
+- "Enter custom topic" option in the dialog;
+- No prompt for dry-run
