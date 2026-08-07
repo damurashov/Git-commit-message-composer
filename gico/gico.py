@@ -345,10 +345,18 @@ def _cli_get_file_module(file_path: str) -> str:
 
     options = list(filter(len, options))
     if len(options) == 0:
-        selected_option = ""
+        selected_option = "core"
     else:
+        options += ["CUSTOM"]
         option_id = tired.ui.select(options, file_path, optimize_obvious_selection=False)
-        selected_option = options[option_id]
+        if option_id == len(options) - 1:
+            res = False
+            while not res:
+                selected_option = input("> enter module name")
+                prompt = input(f"> the name is \"{selected_option}\" [Y/n]")
+                res = (prompt == "Y")
+        else:
+            selected_option = options[option_id]
 
     # Save the value into cache
     cache.save_entry(file_path, selected_option)
