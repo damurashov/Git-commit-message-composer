@@ -79,3 +79,4 @@ python3 -m pip install gico -U --force --break-system-packages
 	2. grouped module name for directories
 - Removing obsolete options, and dead code
 - Migrate from PIP to UV
+- In the temp. file, place the entire commit message. More power to the user
