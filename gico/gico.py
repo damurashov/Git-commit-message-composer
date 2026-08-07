@@ -352,8 +352,8 @@ def _cli_get_file_module(file_path: str) -> str:
         if option_id == len(options) - 1:
             res = False
             while not res:
-                selected_option = input("> enter module name")
-                prompt = input(f"> the name is \"{selected_option}\" [Y/n]")
+                selected_option = input("enter module name > ")
+                prompt = input(f"the name is \"{selected_option}\" [Y/n] >")
                 res = (prompt == "Y")
         else:
             selected_option = options[option_id]
