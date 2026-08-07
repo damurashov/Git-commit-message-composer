@@ -78,3 +78,4 @@ python3 -m pip install gico -U --force --break-system-packages
 	1. individual module name for individual files (when assigned w/ -m), or custom-typed
 	2. grouped module name for directories
 - Removing obsolete options, and dead code
+- Migrate from PIP to UV
