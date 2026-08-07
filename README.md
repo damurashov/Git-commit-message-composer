@@ -73,5 +73,8 @@ python3 -m pip install gico -U --force --break-system-packages
 # Coming soon
 
 - `[doc]` is a sufficient topic of its own;
-- "Enter custom topic" option in the dialog;
 - No prompt for dry-run
+- Better module inference rules w/ priorities:
+	1. individual module name for individual files (when assigned w/ -m), or custom-typed
+	2. grouped module name for directories
+- Removing obsolete options, and dead code
