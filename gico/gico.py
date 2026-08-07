@@ -398,7 +398,7 @@ def _parse_arguments():
     parser.add_argument("--mes", action="store_false", help="Use separate commit message for each file")
     parser.add_argument("--typ", action="store_false", help="Use individual commit type for each file")
     parser.add_argument("--nomodcache", '-n', action="store_true", help="Do not use cache when determinining a file's module")
-    parser.add_argument("--mod", type=str, default=None, help="Custom module name")
+    parser.add_argument("--mod", "-m", type=str, default=None, help="Custom module name")
     parser.add_argument("--dry", '-d', action="store_true", help="Do not change index, do not commit")
     p = parser.parse_args()
 
