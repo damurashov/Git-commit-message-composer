@@ -362,7 +362,7 @@ def _cli_get_commit_type(file_name="") -> str:
         "[i] Impl",  # Implementation (added new feature)
         "[e] Enh",  # Enhancement / optimization (changed / optimized old feature)
         "[r] Ref",  # Made refactoring
-        "[u] Build",  # Build system / project management tweaks
+        "[p] Prj",  # Build system / project management tweaks
         "[d] Doc",  # Updated documentation
     ]
     selected_id = tired.ui.select(commit_types, f"Select commit type {file_name}")
